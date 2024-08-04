@@ -19,10 +19,17 @@ export default function Characters() {
       >
         <p className={"select-none text-nowrap text-center"}>First Character</p>
         <Select
-          value={String(state.characterOne)}
-          onValueChange={(e) =>
-            dispatch({ type: "setCharacterOne", payload: Number(e) })
-          }
+          value={String(state.characterSelected[0])}
+          onValueChange={(e) => {
+            dispatch({
+              type: "setCharacterSelected",
+              payload: [Number(e), state.characterSelected[1]],
+            });
+            dispatch({
+              type: "setPlay",
+              payload: 0,
+            });
+          }}
         >
           <SelectTrigger>
             <SelectValue />
@@ -39,10 +46,17 @@ export default function Characters() {
           Second Character
         </p>
         <Select
-          value={String(state.characterTwo)}
-          onValueChange={(e) =>
-            dispatch({ type: "setCharacterTwo", payload: Number(e) })
-          }
+          value={String(state.characterSelected[1])}
+          onValueChange={(e) => {
+            dispatch({
+              type: "setCharacterSelected",
+              payload: [state.characterSelected[0], Number(e)],
+            });
+            dispatch({
+              type: "setPlay",
+              payload: 0,
+            });
+          }}
         >
           <SelectTrigger>
             <SelectValue />

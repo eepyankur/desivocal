@@ -2,13 +2,23 @@ import React, { createContext, useReducer } from "react";
 
 interface GlobalContextState {
   characters: string[];
-  characterOne: number;
-  characterTwo: number;
+  characterSelected: [number, number];
+  characterHistory: [string, string];
+  play: 0 | 1 | 2;
+  loading: boolean;
 }
 
 type GlobalContextAction =
-  | { type: "setCharacterOne"; payload: number }
-  | { type: "setCharacterTwo"; payload: number };
+  | {
+      type: "setCharacterSelected";
+      payload: GlobalContextState["characterSelected"];
+    }
+  | {
+      type: "setCharacterHistory";
+      payload: GlobalContextState["characterHistory"];
+    }
+  | { type: "setPlay"; payload: GlobalContextState["play"] }
+  | { type: "setLoading"; payload: GlobalContextState["loading"] };
 
 export interface GlobalContextType {
   state: GlobalContextState;
@@ -29,10 +39,15 @@ export function GlobalContextProvider({
       action: GlobalContextAction,
     ): GlobalContextState => {
       switch (action.type) {
-        case "setCharacterOne":
-          return { ...prevState, characterOne: action.payload };
-        case "setCharacterTwo":
-          return { ...prevState, characterTwo: action.payload };
+        case "setCharacterSelected":
+          return { ...prevState, characterSelected: action.payload };
+        case "setCharacterHistory":
+          return { ...prevState, characterHistory: action.payload };
+
+        case "setPlay":
+          return { ...prevState, play: action.payload };
+        case "setLoading":
+          return { ...prevState, loading: action.payload };
         default:
           return prevState;
       }
@@ -45,8 +60,13 @@ export function GlobalContextProvider({
         "Deadpool",
         "Wolverine",
       ],
-      characterOne: 0,
-      characterTwo: 1,
+      characterSelected: [0, 1],
+      characterHistory: [
+        "introduce yourself as character",
+        "introduce yourself as character",
+      ],
+      play: 0,
+      loading: false,
     },
   );
 
