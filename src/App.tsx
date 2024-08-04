@@ -1,5 +1,11 @@
+import Characters from "@/components/Characters.tsx";
+
 function App() {
-  return <div className={"h-dvh w-dvw bg-blue-950 font-jetBrainsMono"}></div>;
+  return (
+    <main className={"w-full font-jetBrainsMono"}>
+      <Characters />
+    </main>
+  );
 }
 
 export default App;
