@@ -8,6 +8,7 @@ interface GlobalContextState {
   textLoading: boolean;
   audioLoading: boolean;
   characterAudio: string;
+  mode: 0 | 1;
 }
 
 type GlobalContextAction =
@@ -25,7 +26,8 @@ type GlobalContextAction =
   | {
       type: "setCharacterAudio";
       payload: GlobalContextState["characterAudio"];
-    };
+    }
+  | { type: "setMode"; payload: GlobalContextState["mode"] };
 
 export interface GlobalContextType {
   state: GlobalContextState;
@@ -59,6 +61,8 @@ export function GlobalContextProvider({
           return { ...prevState, audioLoading: action.payload };
         case "setCharacterAudio":
           return { ...prevState, characterAudio: action.payload };
+        case "setMode":
+          return { ...prevState, mode: action.payload };
         default:
           return prevState;
       }
@@ -80,6 +84,7 @@ export function GlobalContextProvider({
       textLoading: false,
       audioLoading: false,
       characterAudio: "",
+      mode: 0,
     },
   );
 

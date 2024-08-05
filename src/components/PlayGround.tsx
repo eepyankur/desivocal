@@ -1,167 +1,159 @@
 import { useGlobalContext } from "@/hooks/useGlobalContext.tsx";
 import { getCharacterText } from "@/services/LLM.tsx";
-import { useRef, useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useRef } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button.tsx";
+import { ReloadIcon, PlayIcon } from "@radix-ui/react-icons";
 
 export default function PlayGround() {
   const { state, dispatch } = useGlobalContext();
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [mode, setMode] = useState<number>(0);
 
   return (
     <section
-      className={
-        "relative grid h-full w-full grid-cols-1 grid-rows-[5fr,1fr,5fr] place-content-center place-items-center gap-10 md:min-w-[1000px] md:grid-cols-[5fr,1fr,5fr] md:grid-rows-1"
-      }
+      className={`relative grid h-full w-full grid-cols-2 grid-rows-1 place-content-center place-items-center from-[#6d4e7c]/50 to-[#09090b] text-white ${state.player % 2 === 0 ? "bg-gradient-to-r" : "bg-gradient-to-l"}`}
     >
-      <div className="flex h-full w-full justify-start">
-        <img
-          src={`./${state.characters[state.characterSelected[0]]}.png`}
-          alt={state.characters[state.characterSelected[0]]}
-          className={"aspect-square w-1/2 self-end"}
-        />
-        {state.player === 1 && (
-          <div
-            className={`flex h-full w-1/2 flex-col items-start gap-5 pr-10 md:pt-40`}
-          >
-            <Textarea
-              className={"h-1/2 max-w-full rounded-3xl border-2 p-4 text-start"}
-              value={state.textLoading ? "..." : state.characterHistory[0]}
-              onChange={(e) => {
-                dispatch({
-                  type: "setCharacterHistory",
-                  payload: [e.target.value, state.characterHistory[1]],
-                });
-              }}
-            />
-            <div
-              className={
-                "flex aspect-square cursor-pointer items-center justify-center self-end rounded-full border-2 p-4 hover:bg-slate-100"
-              }
-              onClick={() => audioRef.current?.play()}
-            >
-              <p>{state.audioLoading ? "..." : "tts"}</p>
-              {!state.audioLoading && (
-                <audio
-                  preload="auto"
-                  controls={true}
-                  className={"hidden"}
-                  ref={audioRef}
-                >
-                  <source src={state.characterAudio} type="audio/wav" />
-                </audio>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className={"flex flex-row gap-5 md:flex-col"}>
-        <Select
-          value={String(mode)}
-          onValueChange={(e) => {
-            setMode(Number(e));
+      <div
+        className={`group relative flex h-full w-full flex-col items-end justify-start gap-5 md:pt-10`}
+        onClick={() => {
+          if (state.player % 2 === 0) {
             dispatch({
               type: "setPlayer",
-              payload: 0,
-            });
-            dispatch({
-              type: "setCharacterHistory",
-              payload: [
-                "introduce yourself as character",
-                "introduce yourself as character",
-              ],
-            });
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={"Mode"} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={"0"}>Talk</SelectItem>
-            <SelectItem value={"1"}>Roast</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <button
-          className={
-            "aspect-square rounded-full border-2 p-5 font-bold tracking-widest hover:bg-slate-100"
-          }
-          onClick={() => {
-            dispatch({
-              type: "setPlayer",
-              payload: state.player % 2 === 0 ? 1 : 2,
+              payload: 1,
             });
             getCharacterText(
               {
                 state,
                 dispatch,
               },
-              mode,
+              state.mode,
             );
-          }}
+          }
+        }}
+      >
+        <div
+          className={
+            "flex h-full w-full flex-col items-center justify-center gap-2"
+          }
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14">
-            <path
-              fill="none"
-              stroke="black"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M.5 7h10M7 10.5L10.5 7L7 3.5m6.5 0v7"
-            />
-          </svg>
-        </button>
+          {state.player === 1 && (
+            <>
+              <Textarea
+                className={
+                  "h-full w-full resize-none text-balance border-none p-5 text-center text-xl !ring-0 focus:ring-0"
+                }
+                value={state.textLoading ? "..." : state.characterHistory[0]}
+                onChange={(e) => {
+                  dispatch({
+                    type: "setCharacterHistory",
+                    payload: [e.target.value, state.characterHistory[1]],
+                  });
+                }}
+              />
+              <Button
+                disabled={state.audioLoading}
+                variant="ghost"
+                className={
+                  "select-none self-center rounded-3xl border-2 border-[#1b1b1b] bg-black px-8 py-5 text-lg hover:bg-[#1b1b1b]"
+                }
+                onClick={() => audioRef.current?.play()}
+              >
+                <span className={"flex items-center justify-center gap-2"}>
+                  Listen
+                  {state.audioLoading ? (
+                    <ReloadIcon className="animate-spin" />
+                  ) : (
+                    <PlayIcon />
+                  )}
+                </span>
+              </Button>
+              <audio
+                preload="auto"
+                controls={true}
+                className={"hidden"}
+                ref={audioRef}
+              >
+                <source src={state.characterAudio} type="audio/wav" />
+              </audio>
+            </>
+          )}
+        </div>
+        <img
+          src={`./${state.characters[state.characterSelected[0]]}.png`}
+          alt={state.characters[state.characterSelected[0]]}
+          className={`transition-filter pointer-events-none aspect-square w-full select-none self-center duration-300 ease-in-out group-hover:scale-125 md:w-1/2 md:self-start`}
+        />
       </div>
 
-      <div className="flex h-full w-full justify-end">
-        {state.player === 2 && (
-          <div
-            className={
-              "flex h-full w-1/2 flex-col items-end gap-5 pl-10 md:pt-40"
-            }
-          >
-            <Textarea
-              className={"h-1/2 max-w-full rounded-3xl border-2 p-4 text-start"}
-              value={state.textLoading ? "..." : state.characterHistory[1]}
-              onChange={(e) => {
-                dispatch({
-                  type: "setCharacterHistory",
-                  payload: [state.characterHistory[0], e.target.value],
-                });
-              }}
-            />
-            <div
-              className={
-                "flex aspect-square cursor-pointer items-center justify-center self-end rounded-full border-2 p-4 hover:bg-slate-100"
-              }
-              onClick={() => audioRef.current?.play()}
-            >
-              <p>{state.audioLoading ? "..." : "tts"}</p>
-              {!state.audioLoading && (
-                <audio
-                  preload="auto"
-                  controls={true}
-                  className={"hidden"}
-                  ref={audioRef}
-                >
-                  <source src={state.characterAudio} type="audio/wav" />
-                </audio>
-              )}
-            </div>
-          </div>
-        )}
-
+      <div
+        className={`group relative flex h-full w-full flex-col items-end justify-start gap-5 md:pt-10`}
+        onClick={() => {
+          if (state.player % 2 !== 0) {
+            dispatch({
+              type: "setPlayer",
+              payload: 2,
+            });
+            getCharacterText(
+              {
+                state,
+                dispatch,
+              },
+              state.mode,
+            );
+          }
+        }}
+      >
+        <div
+          className={
+            "flex h-full w-full flex-col items-center justify-center gap-2"
+          }
+        >
+          {state.player === 2 && (
+            <>
+              <Textarea
+                className={
+                  "h-full w-full resize-none text-balance border-none p-5 text-center text-xl !ring-0 focus:ring-0"
+                }
+                value={state.textLoading ? "..." : state.characterHistory[1]}
+                onChange={(e) => {
+                  dispatch({
+                    type: "setCharacterHistory",
+                    payload: [state.characterHistory[0], e.target.value],
+                  });
+                }}
+              />
+              <Button
+                disabled={state.audioLoading}
+                variant="ghost"
+                className={
+                  "select-none self-center rounded-3xl border-2 border-[#1b1b1b] bg-black px-8 py-5 text-lg hover:bg-[#1b1b1b]"
+                }
+                onClick={() => audioRef.current?.play()}
+              >
+                <span className={"flex items-center justify-center gap-2"}>
+                  Listen
+                  {state.audioLoading ? (
+                    <ReloadIcon className="animate-spin" />
+                  ) : (
+                    <PlayIcon />
+                  )}
+                </span>
+              </Button>
+              <audio
+                preload="auto"
+                controls={true}
+                className={"hidden"}
+                ref={audioRef}
+              >
+                <source src={state.characterAudio} type="audio/wav" />
+              </audio>
+            </>
+          )}
+        </div>
         <img
           src={`./${state.characters[state.characterSelected[1]]}.png`}
           alt={state.characters[state.characterSelected[1]]}
-          className={"aspect-square w-1/2 self-end"}
+          className={`transition-filter pointer-events-none aspect-square w-full select-none self-center duration-300 ease-in-out group-hover:scale-125 md:w-1/2 md:self-end`}
         />
       </div>
     </section>
