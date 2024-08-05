@@ -1,4 +1,4 @@
-import { useGlobalContext } from "@/hooks/useGlobalContext.tsx";
+import { useGlobalContext } from "@/contexts/GlobalContextProvider.tsx";
 import {
   Select,
   SelectContent,

@@ -1,4 +1,4 @@
-import React, { createContext, useReducer } from "react";
+import React, { createContext, useContext, useReducer } from "react";
 
 interface GlobalContextState {
   characters: string[];
@@ -52,7 +52,6 @@ export function GlobalContextProvider({
           return { ...prevState, characterSelected: action.payload };
         case "setCharacterHistory":
           return { ...prevState, characterHistory: action.payload };
-
         case "setPlayer":
           return { ...prevState, player: action.payload };
         case "setTextLoading":
@@ -93,4 +92,11 @@ export function GlobalContextProvider({
       {children}
     </GlobalContext.Provider>
   );
+}
+
+export function useGlobalContext(): GlobalContextType {
+  const context = useContext(GlobalContext);
+  if (context === null) throw new Error("Global context is undefined");
+
+  return context;
 }
