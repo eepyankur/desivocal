@@ -8,11 +8,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function PlayGround() {
   const { state, dispatch } = useGlobalContext();
-  const [mode, setMode] = useState<number>(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [mode, setMode] = useState<number>(0);
+
   return (
     <section
       className={
@@ -29,17 +31,24 @@ export default function PlayGround() {
           <div
             className={`flex h-full w-1/2 flex-col items-start gap-5 pr-10 md:pt-40`}
           >
-            <p className={"max-w-full rounded-3xl border-2 p-4 text-start"}>
-              {state.textLoading ? "..." : state.characterHistory[0]}
-            </p>
-            {!state.audioLoading && (
-              <div
-                className={
-                  "flex aspect-square cursor-pointer items-center justify-center self-end rounded-full border-2 p-4 hover:bg-slate-100"
-                }
-                onClick={() => audioRef.current?.play()}
-              >
-                <p>tts</p>
+            <Textarea
+              className={"h-1/2 max-w-full rounded-3xl border-2 p-4 text-start"}
+              value={state.textLoading ? "..." : state.characterHistory[0]}
+              onChange={(e) => {
+                dispatch({
+                  type: "setCharacterHistory",
+                  payload: [e.target.value, state.characterHistory[1]],
+                });
+              }}
+            />
+            <div
+              className={
+                "flex aspect-square cursor-pointer items-center justify-center self-end rounded-full border-2 p-4 hover:bg-slate-100"
+              }
+              onClick={() => audioRef.current?.play()}
+            >
+              <p>{state.audioLoading ? "..." : "tts"}</p>
+              {!state.audioLoading && (
                 <audio
                   preload="auto"
                   controls={true}
@@ -48,8 +57,8 @@ export default function PlayGround() {
                 >
                   <source src={state.characterAudio} type="audio/wav" />
                 </audio>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -118,17 +127,24 @@ export default function PlayGround() {
               "flex h-full w-1/2 flex-col items-end gap-5 pl-10 md:pt-40"
             }
           >
-            <p className={`max-w-full rounded-3xl border-2 p-4 text-end`}>
-              {state.textLoading ? "..." : state.characterHistory[1]}
-            </p>
-            {!state.audioLoading && (
-              <div
-                className={
-                  "flex aspect-square cursor-pointer items-center justify-center self-end rounded-full border-2 p-4 hover:bg-slate-100"
-                }
-                onClick={() => audioRef.current?.play()}
-              >
-                <p>tts</p>
+            <Textarea
+              className={"h-1/2 max-w-full rounded-3xl border-2 p-4 text-start"}
+              value={state.textLoading ? "..." : state.characterHistory[1]}
+              onChange={(e) => {
+                dispatch({
+                  type: "setCharacterHistory",
+                  payload: [state.characterHistory[0], e.target.value],
+                });
+              }}
+            />
+            <div
+              className={
+                "flex aspect-square cursor-pointer items-center justify-center self-end rounded-full border-2 p-4 hover:bg-slate-100"
+              }
+              onClick={() => audioRef.current?.play()}
+            >
+              <p>{state.audioLoading ? "..." : "tts"}</p>
+              {!state.audioLoading && (
                 <audio
                   preload="auto"
                   controls={true}
@@ -137,8 +153,8 @@ export default function PlayGround() {
                 >
                   <source src={state.characterAudio} type="audio/wav" />
                 </audio>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
 
