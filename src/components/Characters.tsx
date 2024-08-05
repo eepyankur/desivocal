@@ -29,6 +29,13 @@ export default function Characters() {
               type: "setPlayer",
               payload: 0,
             });
+            dispatch({
+              type: "setCharacterHistory",
+              payload: [
+                "introduce yourself as character",
+                "introduce yourself as character",
+              ],
+            });
           }}
         >
           <SelectTrigger>

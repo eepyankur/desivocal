@@ -15,7 +15,7 @@ export function getCharacterText(
         role: "user",
         parts: [
           {
-            text: `${prompt === 0 ? "Do role play. Output must be of 2 lines and concise " : "Do rap roasting battle. Output must be single liners, witty and rhyming."}  You are ${state.characters[state.characterSelected[state.player % 2 === 0 ? 0 : 1]]} and you are ${prompt === 0 ? "talking to " : "roasting "}  ${state.characters[state.characterSelected[state.player % 2 === 0 ? 1 : 0]]}.`,
+            text: `${prompt === 0 ? "Do role play. Output must be of 2 lines and concise." : "Do rap roasting battle. Output must be single liners, witty and rhyming."} You are ${state.characters[state.characterSelected[state.player % 2 === 0 ? 0 : 1]]} and you are ${prompt === 0 ? "talking to" : "roasting"} ${state.characters[state.characterSelected[state.player % 2 === 0 ? 1 : 0]]}.`,
           },
         ],
       },

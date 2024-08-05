@@ -1,9 +1,17 @@
 import { useGlobalContext } from "@/hooks/useGlobalContext.tsx";
 import { getCharacterText } from "@/services/LLM.tsx";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function PlayGround() {
   const { state, dispatch } = useGlobalContext();
+  const [mode, setMode] = useState<number>(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   return (
     <section
@@ -29,8 +37,9 @@ export default function PlayGround() {
                 className={
                   "flex aspect-square cursor-pointer items-center justify-center self-end rounded-full border-2 p-4 hover:bg-slate-100"
                 }
+                onClick={() => audioRef.current?.play()}
               >
-                <p onClick={() => audioRef.current?.play()}>play</p>
+                <p>tts</p>
                 <audio
                   preload="auto"
                   controls={true}
@@ -46,6 +55,32 @@ export default function PlayGround() {
       </div>
 
       <div className={"flex flex-row gap-5 md:flex-col"}>
+        <Select
+          value={String(mode)}
+          onValueChange={(e) => {
+            setMode(Number(e));
+            dispatch({
+              type: "setPlayer",
+              payload: 0,
+            });
+            dispatch({
+              type: "setCharacterHistory",
+              payload: [
+                "introduce yourself as character",
+                "introduce yourself as character",
+              ],
+            });
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder={"Mode"} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={"0"}>Talk</SelectItem>
+            <SelectItem value={"1"}>Roast</SelectItem>
+          </SelectContent>
+        </Select>
+
         <button
           className={
             "aspect-square rounded-full border-2 p-5 font-bold tracking-widest hover:bg-slate-100"
@@ -55,24 +90,24 @@ export default function PlayGround() {
               type: "setPlayer",
               payload: state.player % 2 === 0 ? 1 : 2,
             });
-            getCharacterText({ state, dispatch }, 0);
+            getCharacterText(
+              {
+                state,
+                dispatch,
+              },
+              mode,
+            );
           }}
         >
-          Talk
-        </button>
-        <button
-          className={
-            "aspect-square rounded-full border-2 p-5 font-bold tracking-widest hover:bg-slate-100"
-          }
-          onClick={() => {
-            dispatch({
-              type: "setPlayer",
-              payload: state.player % 2 === 0 ? 1 : 2,
-            });
-            getCharacterText({ state, dispatch }, 1);
-          }}
-        >
-          Rap
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14">
+            <path
+              fill="none"
+              stroke="black"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M.5 7h10M7 10.5L10.5 7L7 3.5m6.5 0v7"
+            />
+          </svg>
         </button>
       </div>
 
@@ -91,8 +126,9 @@ export default function PlayGround() {
                 className={
                   "flex aspect-square cursor-pointer items-center justify-center self-end rounded-full border-2 p-4 hover:bg-slate-100"
                 }
+                onClick={() => audioRef.current?.play()}
               >
-                <p onClick={() => audioRef.current?.play()}>play</p>
+                <p>tts</p>
                 <audio
                   preload="auto"
                   controls={true}
