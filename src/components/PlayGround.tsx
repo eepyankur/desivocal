@@ -13,7 +13,7 @@ export default function PlayGround() {
     >
       <div className="flex h-full w-full justify-start">
         <img
-          src={`src/assets/${state.characters[state.characterSelected[0]]}.png`}
+          src={`./${state.characters[state.characterSelected[0]]}.png`}
           alt={state.characters[state.characterSelected[0]]}
           className={"aspect-square w-1/2 self-end"}
         />
@@ -107,7 +107,7 @@ export default function PlayGround() {
         )}
 
         <img
-          src={`src/assets/${state.characters[state.characterSelected[1]]}.png`}
+          src={`./${state.characters[state.characterSelected[1]]}.png`}
           alt={state.characters[state.characterSelected[1]]}
           className={"aspect-square w-1/2 self-end"}
         />
