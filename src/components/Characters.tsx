@@ -26,7 +26,7 @@ export default function Characters() {
               payload: [Number(e), state.characterSelected[1]],
             });
             dispatch({
-              type: "setPlay",
+              type: "setPlayer",
               payload: 0,
             });
           }}
@@ -53,8 +53,15 @@ export default function Characters() {
               payload: [state.characterSelected[0], Number(e)],
             });
             dispatch({
-              type: "setPlay",
+              type: "setPlayer",
               payload: 0,
+            });
+            dispatch({
+              type: "setCharacterHistory",
+              payload: [
+                "introduce yourself as character",
+                "introduce yourself as character",
+              ],
             });
           }}
         >

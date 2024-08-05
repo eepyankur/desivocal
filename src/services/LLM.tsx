@@ -1,24 +1,21 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GlobalContextType } from "@/contexts/GlobalContextProvider.tsx";
+import { getCharacterAudio } from "@/services/TTS.tsx";
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GAI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-export async function getConversationText({
-  state,
-  dispatch,
-}: GlobalContextType) {
-  dispatch({
-    type: "setLoading",
-    payload: true,
-  });
+export function getCharacterText(
+  { state, dispatch }: GlobalContextType,
+  prompt: number,
+) {
   const chat = model.startChat({
     history: [
       {
         role: "user",
         parts: [
           {
-            text: `Do roleplay. Output must be short (2 lines), concise and funny. You are ${state.characters[state.characterSelected[state.play % 2 === 0 ? 0 : 1]]} and you are talking to ${state.characters[state.characterSelected[state.play % 2 === 0 ? 1 : 0]]}. `,
+            text: `${prompt === 0 ? "Do role play. Output must be of 2 lines and concise " : "Do rap roasting battle. Output must be single liners, witty and rhyming."}  You are ${state.characters[state.characterSelected[state.player % 2 === 0 ? 0 : 1]]} and you are ${prompt === 0 ? "talking to " : "roasting "}  ${state.characters[state.characterSelected[state.player % 2 === 0 ? 1 : 0]]}.`,
           },
         ],
       },
@@ -26,7 +23,7 @@ export async function getConversationText({
         role: "model",
         parts: [
           {
-            text: `${state.characterHistory[state.characterSelected[state.play % 2 === 0 ? 0 : 1]]}`,
+            text: `${state.characterHistory[state.characterSelected[state.player % 2 === 0 ? 0 : 1]]}`,
           },
         ],
       },
@@ -36,27 +33,42 @@ export async function getConversationText({
     },
   });
 
-  const msg = `${state.characterHistory[state.play % 2 === 0 ? 1 : 0]}`;
+  const msg = `${state.characterHistory[state.player % 2 === 0 ? 1 : 0]}`;
 
-  try {
-    const result = await chat.sendMessage(msg);
-    const response = result.response;
-    const text = response.text();
-    dispatch({
-      type: "setCharacterHistory",
-      payload:
-        state.play % 2 === 0
-          ? [text, state.characterHistory[1]]
-          : [state.characterHistory[0], text],
-    });
-    dispatch({
-      type: "setLoading",
-      payload: false,
-    });
-    console.log(text);
-  } catch (error) {
-    console.error(error);
-    console.error("Generating new response");
-    getConversationText({ state, dispatch });
-  }
+  (async () => {
+    try {
+      dispatch({
+        type: "setTextLoading",
+        payload: true,
+      });
+      dispatch({
+        type: "setAudioLoading",
+        payload: true,
+      });
+      const result = await chat.sendMessage(msg);
+      const response = result.response;
+      const text = response.text();
+      dispatch({
+        type: "setCharacterHistory",
+        payload:
+          state.player % 2 === 0
+            ? [text, state.characterHistory[1]]
+            : [state.characterHistory[0], text],
+      });
+      dispatch({
+        type: "setTextLoading",
+        payload: false,
+      });
+      const audio = await getCharacterAudio(text);
+      dispatch({ type: "setCharacterAudio", payload: audio });
+      dispatch({
+        type: "setAudioLoading",
+        payload: false,
+      });
+    } catch (error) {
+      console.error(error);
+      console.error("Generating new response");
+      getCharacterText({ state, dispatch }, prompt);
+    }
+  })();
 }

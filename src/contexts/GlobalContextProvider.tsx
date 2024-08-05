@@ -4,8 +4,10 @@ interface GlobalContextState {
   characters: string[];
   characterSelected: [number, number];
   characterHistory: [string, string];
-  play: 0 | 1 | 2;
-  loading: boolean;
+  player: 0 | 1 | 2;
+  textLoading: boolean;
+  audioLoading: boolean;
+  characterAudio: string;
 }
 
 type GlobalContextAction =
@@ -17,8 +19,13 @@ type GlobalContextAction =
       type: "setCharacterHistory";
       payload: GlobalContextState["characterHistory"];
     }
-  | { type: "setPlay"; payload: GlobalContextState["play"] }
-  | { type: "setLoading"; payload: GlobalContextState["loading"] };
+  | { type: "setPlayer"; payload: GlobalContextState["player"] }
+  | { type: "setTextLoading"; payload: GlobalContextState["textLoading"] }
+  | { type: "setAudioLoading"; payload: GlobalContextState["audioLoading"] }
+  | {
+      type: "setCharacterAudio";
+      payload: GlobalContextState["characterAudio"];
+    };
 
 export interface GlobalContextType {
   state: GlobalContextState;
@@ -44,10 +51,14 @@ export function GlobalContextProvider({
         case "setCharacterHistory":
           return { ...prevState, characterHistory: action.payload };
 
-        case "setPlay":
-          return { ...prevState, play: action.payload };
-        case "setLoading":
-          return { ...prevState, loading: action.payload };
+        case "setPlayer":
+          return { ...prevState, player: action.payload };
+        case "setTextLoading":
+          return { ...prevState, textLoading: action.payload };
+        case "setAudioLoading":
+          return { ...prevState, audioLoading: action.payload };
+        case "setCharacterAudio":
+          return { ...prevState, characterAudio: action.payload };
         default:
           return prevState;
       }
@@ -65,8 +76,10 @@ export function GlobalContextProvider({
         "introduce yourself as character",
         "introduce yourself as character",
       ],
-      play: 0,
-      loading: false,
+      player: 0,
+      textLoading: false,
+      audioLoading: false,
+      characterAudio: "",
     },
   );
 
