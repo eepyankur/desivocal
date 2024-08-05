@@ -1,13 +1,27 @@
 import { useGlobalContext } from "@/hooks/useGlobalContext.tsx";
 import { getCharacterText } from "@/services/LLM.tsx";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button.tsx";
-import { ReloadIcon, PlayIcon } from "@radix-ui/react-icons";
+import { ReloadIcon, PlayIcon, PauseIcon } from "@radix-ui/react-icons";
 
 export default function PlayGround() {
   const { state, dispatch } = useGlobalContext();
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audioControl, setAudioControl] = useState<boolean>(false);
+
+  // quirky, use different stores
+  /* eslint-disable */
+  useEffect(() => {
+    getCharacterText(
+      {
+        state,
+        dispatch,
+      },
+      state.mode,
+    );
+  }, [state.player]);
+  /* eslint-enable */
 
   return (
     <section
@@ -21,13 +35,6 @@ export default function PlayGround() {
               type: "setPlayer",
               payload: 1,
             });
-            getCharacterText(
-              {
-                state,
-                dispatch,
-              },
-              state.mode,
-            );
           }
         }}
       >
@@ -56,25 +63,33 @@ export default function PlayGround() {
                 className={
                   "select-none self-center rounded-3xl border-2 border-[#1b1b1b] bg-black px-8 py-5 text-lg hover:bg-[#1b1b1b]"
                 }
-                onClick={() => audioRef.current?.play()}
+                onClick={() => {
+                  if (audioRef.current?.paused) audioRef.current?.play();
+                  else audioRef.current?.pause();
+                  setAudioControl((audioControl) => !audioControl);
+                }}
               >
                 <span className={"flex items-center justify-center gap-2"}>
                   Listen
                   {state.audioLoading ? (
                     <ReloadIcon className="animate-spin" />
-                  ) : (
+                  ) : !audioControl ? (
                     <PlayIcon />
+                  ) : (
+                    <PauseIcon />
                   )}
                 </span>
               </Button>
-              <audio
-                preload="auto"
-                controls={true}
-                className={"hidden"}
-                ref={audioRef}
-              >
-                <source src={state.characterAudio} type="audio/wav" />
-              </audio>
+              {!state.audioLoading && (
+                <audio
+                  preload="auto"
+                  controls={true}
+                  className={"hidden"}
+                  ref={audioRef}
+                >
+                  <source src={state.characterAudio} type="audio/wav" />
+                </audio>
+              )}
             </>
           )}
         </div>
@@ -93,13 +108,6 @@ export default function PlayGround() {
               type: "setPlayer",
               payload: 2,
             });
-            getCharacterText(
-              {
-                state,
-                dispatch,
-              },
-              state.mode,
-            );
           }
         }}
       >
@@ -128,25 +136,33 @@ export default function PlayGround() {
                 className={
                   "select-none self-center rounded-3xl border-2 border-[#1b1b1b] bg-black px-8 py-5 text-lg hover:bg-[#1b1b1b]"
                 }
-                onClick={() => audioRef.current?.play()}
+                onClick={() => {
+                  if (audioRef.current?.paused) audioRef.current?.play();
+                  else audioRef.current?.pause();
+                  setAudioControl((audioControl) => !audioControl);
+                }}
               >
                 <span className={"flex items-center justify-center gap-2"}>
                   Listen
                   {state.audioLoading ? (
                     <ReloadIcon className="animate-spin" />
-                  ) : (
+                  ) : !audioControl ? (
                     <PlayIcon />
+                  ) : (
+                    <PauseIcon />
                   )}
                 </span>
               </Button>
-              <audio
-                preload="auto"
-                controls={true}
-                className={"hidden"}
-                ref={audioRef}
-              >
-                <source src={state.characterAudio} type="audio/wav" />
-              </audio>
+              {!state.audioLoading && (
+                <audio
+                  preload="auto"
+                  controls={true}
+                  className={"hidden"}
+                  ref={audioRef}
+                >
+                  <source src={state.characterAudio} type="audio/wav" />
+                </audio>
+              )}
             </>
           )}
         </div>

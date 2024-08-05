@@ -9,13 +9,15 @@ export function getCharacterText(
   { state, dispatch }: GlobalContextType,
   prompt: number,
 ) {
+  if (state.player === 0) return;
+
   const chat = model.startChat({
     history: [
       {
         role: "user",
         parts: [
           {
-            text: `${prompt === 0 ? "Do role play. Output must be of 2 lines and concise." : "Do rap roasting battle. Output must be single liners, witty and rhyming."} You are ${state.characters[state.characterSelected[state.player % 2 === 0 ? 0 : 1]]} and you are ${prompt === 0 ? "talking to" : "roasting"} ${state.characters[state.characterSelected[state.player % 2 === 0 ? 1 : 0]]}.`,
+            text: `${prompt === 0 ? "Do role play. Output must be of 2 lines and concise." : "Do rap roasting battle. Output must be single liners, witty and rhyming."} You are ${state.characters[state.characterSelected[state.player % 2 !== 0 ? 0 : 1]]} and you are ${prompt === 0 ? "talking to" : "roasting"} ${state.characters[state.characterSelected[state.player % 2 !== 0 ? 1 : 0]]}.`,
           },
         ],
       },
@@ -33,7 +35,7 @@ export function getCharacterText(
     },
   });
 
-  const msg = `${state.characterHistory[state.player % 2 === 0 ? 1 : 0]}`;
+  const msg = `${state.characterHistory[state.player % 2 !== 0 ? 1 : 0]}`;
 
   (async () => {
     try {
@@ -51,7 +53,7 @@ export function getCharacterText(
       dispatch({
         type: "setCharacterHistory",
         payload:
-          state.player % 2 === 0
+          state.player % 2 !== 0
             ? [text, state.characterHistory[1]]
             : [state.characterHistory[0], text],
       });
